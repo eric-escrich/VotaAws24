@@ -27,7 +27,7 @@ try {
 </head>
 
 <body id="login">
-    <?php include_once("common/header.php"); ?>
+    <?php include_once ("common/header.php"); ?>
     <ul id="notification__list"></ul>
     <main>
         <h1>Iniciar sesión</h1>
@@ -43,7 +43,7 @@ try {
     </main>
 
     <div class="footer">
-        <?php include_once("common/footer.php") ?>
+        <?php include_once ("common/footer.php") ?>
     </div>
 
 
@@ -53,11 +53,15 @@ try {
 
 <?php
 try {
+    if (isset($_GET["pwdChanged"])) {
+        echo "<script>successfulNotification('La contraseña se ha modificado correctamente');</script>";
+    }
     include 'data/dbAccess.php';
-
     if (isset($_POST['email']) && isset($_POST['password'])) {
         $email = $_POST["email"];
         $password = $_POST["password"];
+        echo "<script>console.log('email: $email, password: $password')</script>";
+        echo "email: $email, password: $password";
         $passhash = hash('sha512', $password);
         $pdo = new PDO("mysql:host=$hostname;dbname=$dbname", $username, $pw);
 

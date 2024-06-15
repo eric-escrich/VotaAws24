@@ -43,7 +43,7 @@ try {
 
 <body id="forgot-pass">
     <?php
-    include_once("common/header.php"); ?>
+    include_once ("common/header.php"); ?>
     <ul id="notification__list"></ul>
     <?php if (isset($_POST['pass']) || isset($_POST['pass-confirm']) || isset($_POST['mail'])):
         $logTxt = "\n[" . end($filePathParts) . " ― " . date('H:i:s') . " ― POST]: Hemos recibido el post.\n";
@@ -65,7 +65,7 @@ try {
         echo "
             <script>
                 successfulNotification('¡Has actualizado tu contraseña!');
-                window.location.href = 'login.php';
+                window.location.href = 'login.php?pwdChanged';
             </script>
         ";
     else:
@@ -74,10 +74,15 @@ try {
                 <main>
                     <h1>¿Has olvidado tu contraseña?</h1>
                     <div>
-                        <p>¡No te preocupes! Puedes recuperarla introduciendo tu mail en el siguiente campo de texto.</p>
-                        <p>Te enviaremos un correo con indicaciones para poder cambiar tu contraseña. Aún así, te tenemos que
+                        <p class="centrar">¡No te preocupes! Puedes recuperarla introduciendo tu mail en el siguiente campo de
+                            texto.</p>
+                        <br>
+                        <p class="centrar">Te enviaremos un correo con indicaciones para poder cambiar tu contraseña. Aún así, te
+                            tenemos que
                             advertir de lo siguiente:</p>
-                        <p>Al restablecer tu contraseña, perderás por completo el acceso a la lista de encuestas en las que has
+                        <br>
+                        <p class="centrar">Al restablecer tu contraseña, perderás por completo el acceso a la lista de encuestas en
+                            las que has
                             participado.</p>
                     </div>
                     <form method="POST" id="forgot-form">
@@ -104,6 +109,8 @@ try {
                 } else {
                     $row = $query->fetch();
 
+                    $token = $row['token'];
+
                     $mail = new PHPMailer();
                     $mail->IsSMTP();
                     $mail->Mailer = "smtp";
@@ -116,16 +123,82 @@ try {
                     $mail->Username = $emailUsername;
                     $mail->Password = $emailPassword;
 
-                    $link = "https://aws24.ieti.site/vote.php?token=" . $row['token'];
+                    // $link = "https://aws24.ieti.site/forgot_pass.php?token=$token";
+                    $link = "http://0.0.0.0:8081/forgot_pass.php?token=$token";
                     $mail->IsHTML(true);
                     $mail->AddAddress($_POST["email-forgot"]);
                     $mail->SetFrom($emailUsername);
                     $mail->Subject = '¿HAS OLVIDADO TU CONTRASEÑA?';
-                    $mail->SetFrom('vota@aws24.ieti.com', 'Vota Team');
-                    $content = "Haz clic en este enlace para cambiar tu contraseña: $link";
+                    $mail->SetFrom('vota@aws24.ieti.com', 'VOTA TEAM');
+                    $content = <<<HTML
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <style>
+                            body {
+                                font-family: Arial, sans-serif;
+                                background-color: #f2f2f2;
+                                margin: 0;
+                                padding: 0;
+                            }
+                            .container {
+                                max-width: 600px;
+                                margin: 50px auto;
+                                background-color: #fff;
+                                padding: 20px;
+                                border-radius: 10px;
+                                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                            }
+                            h1 {
+                                color: #333;
+                                text-align: center;
+                                font-size: 1.5rem;
+                            }
+                            p {
+                                color: #666;
+                                text-align: center;
+                                font-size: 1.125rem;
+                            }
+                            p span {
+                                text-align: right;
+                            }
+                            .container > div {
+                                display: flex;
+                                justify-content: center;
+                            }
+                            .container > div > a {
+                                display: inline-block;
+                                background-color: #4CAF50;
+                                color: white;
+                                padding: 0.625rem 1.25rem;
+                                text-align: center;
+                                text-decoration: none;
+                                border-radius: 5px;
+                                margin: 1.25rem auto;
+                                cursor: pointer;
+                                font-size: 1.125rem;
+                            }
+                            a:hover {
+                                background-color: #45a049;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="container">
+                            <h1>Hola {$name},</h1>
+                            <p>Para restablecer la contrasenya, por favor haz clic en el botón de abajo:</p>
+                            <div>
+                                <a href="{$link}">Restablecer contrasenya</a>
+                            </div>
+                            <p>Si no ha solicitado un restablecimiento de contraseña, por favor ignora este correo electrónico.</p>
+                            <br>
+                            <p>Gracias,<br>VOTA TEAM</p>
+                        </div>
+                    </body>
+                    </html>
+                    HTML;
                     $mail->MsgHTML($content);
                     $mail->CharSet = 'UTF-8';
-                    $mail->Send();
 
                     if (!$mail->Send()) {
                         $logTxt = "\n[" . end($filePathParts) . " ― " . date('H:i:s') . " ― ERROR MAIL SENDING]: Envio de correo de recuperacion de contraseña a " . $_POST["email-forgot"] . " erroneo.\n";
@@ -135,10 +208,11 @@ try {
                         file_put_contents($logFilePath, $logTxt, FILE_APPEND); ?>
                         <main>
                             <h1>VERIFICA QUE ERES TU</h1>
-                            <p>Te hemos enviado un email a <b>
-                                    <?php echo $_POST["email-forgot"] ?>
-                                </b> con un enlace para verificar que realmente eres tu.</p>
-                            <p>Si no lo encuentras, revisa la carpeta de spam.</p>
+                            <p class="centrar">Te hemos enviado un email a <b><?php echo $_POST["email-forgot"] ?></b> con un enlace para
+                                verificar que realmente eres tu.</p>
+                            <br>
+                            <p class="centrar">Si no lo encuentras, revisa la carpeta de spam.</p>
+                            <br>
                             <a href="https://mail.google.com/mail" target="_blank">Ir al correo</a>
                         </main>
 
@@ -159,6 +233,7 @@ try {
                 $_SESSION["usuario"] = $row['user_id']; ?>
 
                 <main>
+                    <h1 class="centrar">Actualiza tu contraseña</h1>
                     <form method="POST" id="change-password-form">
                         <label for="pass">Nueva contraseña:</label>
                         <input type="password" name="pass" id="pass" required>
@@ -171,7 +246,7 @@ try {
             <?php }
         endif;
     endif;
-    include("common/footer.php"); ?>
+    include ("common/footer.php"); ?>
 </body>
 
 </html>
