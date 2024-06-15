@@ -628,37 +628,60 @@ a:hover { color: var(--azul); }
  #promotional-section {
     display: flex;
     justify-content: center;
+    width: 100%;
+    height: auto;
 }
 
 #promotional-section img {
     aspect-ratio: 3.88/1;
+    max-width: 100%;
+    height: auto;
 }
 
 footer {
     width: 100%;
     align-self: flex-end;
     padding: 2vh 0 ;
-}
-.authors {
     display: flex;
-    flex-direction: row;
-    justify-content: space-evenly;
-    text-align: center;
+    flex-direction: column;
     align-items: center;
 }
-.continfo p {
-    margin: 5%;
+
+footer .authors {
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+    align-items: flex-start;
+    width: 100%;
+    margin-bottom: 1.5rem;
+}
+
+footer .continfo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 25rem;
+}
+
+footer .mail {
+    margin: 1rem;
 }
 
 .links {
     display: flex;
-    flex-direction: column;
     justify-content: center;
     text-align: center;
+    width: 100%;
 }
 
 .links a {
     text-decoration-thickness: 2px;
+}
+
+@media only screen and (max-width: 1000px) {
+    footer .continfo > p:last-child {
+        display: none;
+    }
 }
 
 
@@ -1479,6 +1502,10 @@ span.apexcharts-legend-text {
     font-size: 18px;
     line-height: 25px;
     max-width: 700px;
+}
+
+#forgot-pass .centrar {
+    text-align: center;
 }
 
 #forgot-pass > main p+p {
