@@ -35,18 +35,20 @@ try {
 
     <body id="mailVerification">
         <?php
-        include_once("common/header.php");
-        if (!isset($_SESSION["usuario"])) {
-            header("HTTP/1.1 403 Forbidden");
-            exit();
-        }
-
+        include_once ("common/header.php");
+        // if (!isset($_SESSION["usuario"])) {
+        //     header("HTTP/1.1 403 Forbidden");
+        //     exit();
+        // }
+    
         if (isset($_GET['token'])) {
             $query = $pdo->prepare("SELECT * FROM User WHERE token = :token");
             $query->execute([':token' => $_GET['token']]);
             $row = $query->fetch();
 
-            if ($row && $row['user_id'] && $row['user_id'] === $_SESSION["usuario"]) {
+            if ($row && $row['user_id']) {
+                $_SESSION["usuario"] = $row['user_id'];
+
                 $query = $pdo->prepare("UPDATE User SET is_mail_valid = true WHERE user_id = :id");
                 $query->execute([':id' => $_SESSION["usuario"]]);
                 $logTxt = "\n[" . end($filePathParts) . " ― " . date('H:i:s') . " ― MAIL VAERIFICATED]: Se ha verificado el email.\n";
@@ -84,7 +86,8 @@ try {
                     $query->execute([':token' => $token, ':user_id' => $_SESSION["usuario"]]);
                 }
 
-                $link = "https://aws24.ieti.site/mail_verification.php?token=$token";
+                // $link = "https://aws24.ieti.site/mail_verification.php?token=$token";
+                $link = "http://0.0.0.0:8081/mail_verification.php?token=$token";
                 try {
                     $mail = new PHPMailer();
                     $mail->IsSMTP();
@@ -92,7 +95,6 @@ try {
                     $mail->IsSMTP();
                     $mail->CharSet = 'UTF-8';
                     $mail->Encoding = 'base64';
-
 
                     // $mail->SMTPDebug = 1;
                     $mail->SMTPAuth = TRUE;
@@ -104,13 +106,79 @@ try {
 
                     $mail->IsHTML(true);
                     $mail->AddAddress($row['user_mail']);
-                    $mail->SetFrom($emailUsername);
-                    $mail->Subject = 'Verificacion de correo electronico';
-                    $content = "Haz clic en este enlace para verificar tu correo electrónico: $link";
+                    $mail->SetFrom('vota@aws24.ieti.com', 'VOTA TEAM');
+                    $mail->Subject = '¡VERIFICA TU CORREO ELECTRÓNICO!';
+                    $name = $row['customer_name'];
+                    $content = <<<HTML
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <style>
+                            body {
+                                font-family: Arial, sans-serif;
+                                background-color: #f2f2f2;
+                                margin: 0;
+                                padding: 0;
+                            }
+                            .container {
+                                max-width: 600px;
+                                margin: 50px auto;
+                                background-color: #fff;
+                                padding: 20px;
+                                border-radius: 10px;
+                                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                            }
+                            h1 {
+                                color: #333;
+                                text-align: center;
+                                font-size: 1.5rem;
+                            }
+                            p {
+                                color: #666;
+                                text-align: center;
+                                font-size: 1.125rem;
+                            }
+                            p span {
+                                text-align: right;
+                            }
+                            .container > div {
+                                display: flex;
+                                justify-content: center;
+                            }
+                            .container > div > a {
+                                display: inline-block;
+                                background-color: #4CAF50;
+                                color: white;
+                                padding: 0.625rem 1.25rem;
+                                text-align: center;
+                                text-decoration: none;
+                                border-radius: 5px;
+                                margin: 1.25rem auto;
+                                cursor: pointer;
+                                font-size: 1.125rem;
+                            }
+                            a:hover {
+                                background-color: #45a049;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="container">
+                            <h1>Hola {$name},</h1>
+                            <p>Para verificar tu cuenta de correo electrónico, por favor haz clic en el botón de abajo:</p>
+                            <div>
+                                <a href="{$link}">Verificar cuenta</a>
+                            </div>
+                            <p>Si no has solicitado verificar tu cuenta, por favor ignora este correo electrónico.</p>
+                            <br>
+                            <p>Gracias,<br>VOTA TEAM</p>
+                        </div>
+                    </body>
+                    </html>
+                    HTML;
 
                     $mail->MsgHTML($content);
                     $mail->CharSet = 'UTF-8';
-                    $mail->Send();
                     if (!$mail->Send()) {
                         $logTxt = "\n[" . end($filePathParts) . " ― " . date('H:i:s') . " ― MAIL ERROR]: Ha habido un error al enviarle un email al correo " . $row['user_mail'] . ".\n";
                         file_put_contents($logFilePath, $logTxt, FILE_APPEND);
@@ -137,7 +205,7 @@ try {
 
                 <ul id="notification__list"></ul>
                 <div class="footer">
-                    <?php include_once("common/footer.php") ?>
+                    <?php include_once ("common/footer.php") ?>
                 </div>
                 <script> successfulNotification('¡Registro completado!'); </script>
             </body>
