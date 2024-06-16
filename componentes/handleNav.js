@@ -33,7 +33,7 @@ $(document).ready(function() {
             if (!$('.hamburger-menu').length) {
                 const hamburgerMenu = $('<li>', { class: 'hamburger-menu' });
                 const svgElement = $(`
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <svg class="icono" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                         <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                         <path d="M4 7h16" />
                         <path d="M4 12h16" />
@@ -62,7 +62,7 @@ $(document).ready(function() {
             $('body').append(overlay);
             const sidebar = $('<div>', { class: 'sidebar' });
             const closeIcon = $('\
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">\
+                <svg class="icono" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">\
                     <path stroke="none" d="M0 0h24v24H0z" fill="none"/>\
                     <path d="M18 6L6 18M6 6l12 12" />\
                 </svg>\

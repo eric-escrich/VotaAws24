@@ -33,10 +33,6 @@ body, html {
     padding: 0;
 }
 
-main {
-    background-color: var(--gris-oscuro);
-}
-
 a {
     text-decoration-thickness: 3px;
     text-decoration-color: var(--azul);
@@ -47,6 +43,7 @@ a {
 
 body {
     background-color: var(--gris-oscuro);
+    color: var(--gris-claro);
     margin: 0;
     padding: 0;
     min-height: 100vh;
@@ -63,9 +60,159 @@ main {
 }
 
 footer {
-    background-color: #333;
-    color: white;
+    background-color: transparent;
     text-align: center;
+}
+
+/* -----------------------------------------------------
+ * light-mode
+ * -----------------------------------------------------*/
+ body.light-mode footer {
+    color: var(--gris-oscuro);
+}
+
+body.light-mode {
+    background-color: var(--gris-claro);
+    color: var(--gris-oscuro);
+}
+
+body.light-mode h1,
+body.light-mode h2,
+body.light-mode h3,
+body.light-mode h4,
+body.light-mode h5,
+body.light-mode h6,
+body.light-mode span,
+body.light-mode p,
+body.light-mode label,
+body.light-mode a {
+    color: var(--gris-oscuro);
+}
+
+body.light-mode svg.icono {
+    stroke: var(--gris-oscuro);
+}
+
+body.light-mode#login input {
+    background-color: var(--gris-claro);
+    border-bottom: 3px solid var(--gris-oscuro);
+    color: var(--gris-oscuro);
+}
+
+body.light-mode#login input::placeholder {
+    color: var(--gris-oscuro);
+}
+
+body.light-mode#login button {
+    background-color: var(--gris-claro);
+    color: var(--gris-oscuro);
+    border: var(--gris-oscuro) 3px solid;
+}
+
+body.light-mode#login button:hover {
+    background-color: var(--gris-oscuro);
+    color: var(--gris-claro);
+}
+
+body.light-mode#dashboard main li {
+    background-color: var(--gris-oscuro);
+}
+
+body.light-mode#dashboard main li > a {
+    color: var(--gris-claro);
+}
+
+body.light-mode#createPoll input {
+    background-color: var(--gris-claro);
+    border-bottom: 6px solid var(--gris-oscuro);
+    color: var(--gris-oscuro);
+}
+
+body.light-mode#createPoll input::placeholder {
+    color: var(--gris-oscuro);
+}
+
+body.light-mode#createPoll button {
+    background-color: var(--gris-claro);
+    color: var(--gris-oscuro);
+    border: var(--gris-oscuro) 3px solid;
+}
+
+body.light-mode#createPoll button:hover {
+    background-color: var(--gris-oscuro);
+    color: var(--gris-claro);
+}
+
+body.light-mode#list_polls > main section.grid-polls > article.grid-poll-item a {
+    border: 2px solid var(--gris-oscuro);
+}
+
+body.light-mode#list_polls > main section.grid-polls > article.grid-poll-item a:hover {
+    border: 2px solid var(--azul);
+}
+
+body.light-mode#list_polls > main section.grid-polls > article.grid-poll-item a > footer > div,
+body.light-mode#list_polls > main section.grid-polls > article.grid-poll-item a div > * {
+    color: var(--gris-oscuro);
+}
+
+body.light-mode#list_polls #modal-share input, body.light-mode#list_polls .share-button {
+    border: 2px solid var(--gris-oscuro);
+    color: var(--gris-claro);
+    background-color: var(--gris-oscuro);
+}
+
+body.light-mode#list_polls #modal-share input:hover, body.light-mode#list_polls .share-button:hover {
+    color: var(--gris-oscuro) !important;
+    background-color: var(--gris-claro);
+}
+
+body.light-mode #notification__list::-webkit-scrollbar-thumb {
+    background-color: var(--gris-oscuro);
+}
+body.light-mode #notification__list li {
+    border: 3px solid var(--gris-oscuro);
+}
+
+body.light-mode #notification__list li:hover {
+    background-color: #b0b0b0;
+}
+
+body.light-mode #notification__list > li button:hover {
+    border: 1px solid var(--gris-oscuro);
+}
+
+body.light-mode .survey-details-chart {
+    border-right: 2px solid var(--gris-oscuro);
+}
+
+body.light-mode .chart-opt {
+    border: 2px solid var(--gris-oscuro);
+    border-left: none;
+    color: var(--gris-oscuro);
+}
+
+body.light-mode .chart-opt.active-chart-butt {
+    border: 3px solid var(--azul);
+    border-left: none;
+}
+
+body.light-mode#survey_details > main > aside > div > form > input[type='submit'] {
+    border: 3px solid var(--gris-oscuro);
+    color: var(--gris-oscuro);
+    background-color: transparent;
+}
+
+body.light-mode#survey_details > main > aside > div > form > input[type='submit']:hover {
+    background-color: var(--gris-oscuro);
+    color: var(--gris-claro);
+    text-decoration-color: var(--gris-claro);
+}
+
+body.light-mode#survey_details > main > aside > div > form div > select {
+    border-bottom: 3px solid var(--gris-oscuro);
+    color: var(--gris-oscuro);
+
 }
 
 /* -----------------------------------------------------
@@ -566,6 +713,47 @@ a:hover { color: var(--azul); }
     margin: 2rem 0;
 }
 
+.toggle-switch {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.toggle-switch input {
+    display: none;
+}
+
+.toggle-switch label {
+    display: inline-block;
+    width: 60px;
+    height: 30px;
+    background-color: #ccc;
+    border-radius: 30px;
+    position: relative;
+    cursor: pointer;
+}
+
+.toggle-switch label::after {
+    content: '';
+    display: block;
+    width: 26px;
+    height: 26px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    transition: all 0.3s;
+}
+
+.toggle-switch input:checked + label {
+    background-color: var(--azul);
+}
+
+.toggle-switch input:checked + label::after {
+    transform: translateX(30px);
+}
+
 
 /* -----------------------------------------------------
  * INDEX
@@ -743,6 +931,7 @@ footer .mail {
     overflow-y: auto;
     margin: 0;
     padding: 0;
+    z-index: 1000;
 }
 
 #notification__list::-webkit-scrollbar {
@@ -946,36 +1135,37 @@ footer .mail {
 /* -----------------------------------------------------
  * SURVEY DETAILS
  * -----------------------------------------------------*/
- #survey_details {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100vw;
-    overflow-x: hidden;
-    min-height: 100vh;
-}
-
 #survey_details > a {
     position: absolute;
     font-size: 20px;
-    left: 10px;
-    top: 10px;
+    left: 30px;
+    top: 90px;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
 #survey_details > main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    overflow-x: hidden;
+    min-height: 100vh;
     /*width: 600px;*/
     display: block;
 }
 
-#survey_details span, #survey_details label { font-size: 20px; }
-
 #survey_details > main > section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     padding: 20px;
 }
+
+#survey_details span, #survey_details label { font-size: 20px; }
 
 #survey_details > main > section > h1 {
     font-size: 45px;
@@ -1040,7 +1230,6 @@ footer .mail {
     cursor: pointer;
     width: fit-content;
     font-size: 20px;
-    text-decoration: underline;
     text-decoration-thickness: 3px;
     font-weight: 600;
     transition: color .15s linear, background-color .15s linear, text-decoration-color .15s linear;
@@ -1223,10 +1412,11 @@ span.apexcharts-legend-text {
     transition: color .2s, background-color .2s;
 }
 
-#list_polls #modal-share input:hover
-#list_polls .share-button {
-    color: var(--gris-claro)!important;
+#list_polls #modal-share input:hover,
+#list_polls .share-button:hover {
+    color: var(--gris-claro) !important;
     background-color: var(--gris-oscuro);
+    border: 2px solid var(--gris-claro);
 }
 
 #list_polls #modal-share::backdrop {
@@ -1450,7 +1640,7 @@ span.apexcharts-legend-text {
   }
   
   input:checked + .slider {
-    background-color: #66bb6a;
+    background-color: var(--azul);
   }
   
   input:checked + .slider:before {

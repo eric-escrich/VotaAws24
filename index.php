@@ -15,7 +15,7 @@
 
 <body id="index">
     <?php
-    include_once("common/header.php")
+    include_once ("common/header.php")
         ?>
     <div class="bodyimg">
         <div class="bodytext">
@@ -25,7 +25,7 @@
             </div>
         </div>
         <div class="godown">
-            <a href="#maintext" class="ancoreto"><svg xmlns="http://www.w3.org/2000/svg"
+            <a href="#maintext" class="ancoreto"><svg class="icono" xmlns="http://www.w3.org/2000/svg"
                     class="icon icon-tabler icon-tabler-arrow-badge-down-filled" width="60" height="60"
                     viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
                     stroke-linejoin="round">
@@ -59,7 +59,7 @@
     </div>
     </div>
     <?php
-    include_once("common/footer.php")
+    include_once ("common/footer.php")
         ?>
 </body>
 
