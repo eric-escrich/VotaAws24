@@ -1,4 +1,5 @@
 <?php
+// Iniciar la sesión y manejar excepciones
 try {
     $logFilePath = "logs/log" . date("d-m-Y") . ".txt";
     if (!file_exists(dirname($logFilePath))) {
@@ -45,8 +46,6 @@ try {
     <div class="footer">
         <?php include_once ("common/footer.php") ?>
     </div>
-
-
 </body>
 
 </html>
@@ -57,22 +56,16 @@ try {
         echo "<script>successfulNotification('La contraseña se ha modificado correctamente');</script>";
     }
     include 'data/dbAccess.php';
+
     if (isset($_POST['email']) && isset($_POST['password'])) {
         $email = $_POST["email"];
         $password = $_POST["password"];
-        echo "<script>console.log('email: $email, password: $password')</script>";
-        echo "email: $email, password: $password";
         $passhash = hash('sha512', $password);
         $pdo = new PDO("mysql:host=$hostname;dbname=$dbname", $username, $pw);
 
-        // Cambiar query
-        // $query = $pdo->prepare("SELECT * FROM `User` WHERE `user_pass` = SHA2(:pwd, 512) AND `user_mail` = :email");
         $query = $pdo->prepare("SELECT * FROM User WHERE user_pass = :pwd AND user_mail = :email");
-
         $query->bindParam(':email', $email, PDO::PARAM_STR);
         $query->bindParam(':pwd', $passhash, PDO::PARAM_STR);
-        // $query->bindParam(':pwd', $password, PDO::PARAM_STR);
-
         $query->execute();
 
         $row = $query->fetch();
@@ -89,16 +82,13 @@ try {
                 header("Location: terms_conditions.php");
                 exit();
             }
-            header("Location: dashboard.php?succ=1");
+            echo "<script>window.location.href = 'dashboard.php?succ=1'</script>";
             exit();
         } else {
-            // Añadir las notificaciones
             $logTxt = "\n[" . end($filePathParts) . " ― " . date('H:i:s') . " ― LOGIN ERROR]: los datos introducidos son erroneos o no existen\n";
             file_put_contents($logFilePath, $logTxt, FILE_APPEND);
-            echo "<script> errorNotification('Los datos no coinciden en nuestra base de datos o no existen.'); </script>";
+            echo "<script>errorNotification('Los datos no coinciden en nuestra base de datos o no existen.');</script>";
         }
-    } else {
-        echo "no va";
     }
 } catch (PDOException $e) {
     $logTxt = "\n[" . end($filePathParts) . " ― " . date('H:i:s') . " ― DB ERROR]: Ha habido un error al conectarse a la base de datos: " . $e->getMessage() . "\n";
