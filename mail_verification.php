@@ -86,8 +86,8 @@ try {
                     $query->execute([':token' => $token, ':user_id' => $_SESSION["usuario"]]);
                 }
 
-                // $link = "https://aws24.ieti.site/mail_verification.php?token=$token";
-                $link = "http://0.0.0.0:8081/mail_verification.php?token=$token";
+                $link = "https://eescrichalmagro.ieti.cat/vota/VotaAws24/mail_verification.php?token=$token";
+                // $link = "http://0.0.0.0:8081/mail_verification.php?token=$token";
                 try {
                     $mail = new PHPMailer();
                     $mail->IsSMTP();

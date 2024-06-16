@@ -123,8 +123,8 @@ try {
                     $mail->Username = $emailUsername;
                     $mail->Password = $emailPassword;
 
-                    // $link = "https://aws24.ieti.site/forgot_pass.php?token=$token";
-                    $link = "http://0.0.0.0:8081/forgot_pass.php?token=$token";
+                    $link = "https://eescrichalmagro.ieti.cat/vota/VotaAws24/forgot_pass.php?token=$token";
+                    // $link = "http://0.0.0.0:8081/forgot_pass.php?token=$token";
                     $mail->IsHTML(true);
                     $mail->AddAddress($_POST["email-forgot"]);
                     $mail->SetFrom($emailUsername);
