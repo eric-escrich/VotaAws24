@@ -240,6 +240,11 @@ try {
                         <label for="pass-confirm">Confirma tu nueva contraseña:</label>
                         <input type="password" name="pass-confirm" id="pass-confirm" required>
                         <input type="hidden" name="mail" value="<?php echo $row['user_mail']; ?>">
+                        <br>
+                        <p class="centrar">Al restablecer tu contraseña, perderás por completo el acceso a la lista de encuestas en
+                            las que has participado. Si recuperas tu contraseña, ya no podrás revisar ni cambiar tus votos
+                            anteriores.</p>
+                        <br>
                         <input type="submit" value="Cambiar contraseña">
                     </form>
                 </main>

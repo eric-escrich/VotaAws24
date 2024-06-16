@@ -2,116 +2,117 @@
 <html lang="es">
 
 <head>
-    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"
+        integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
     <script src="componentes/notificationHandler.js"></script>
     <script src="./survey_details.js"></script>
-<?php
-include 'data/dbAccess.php';
-session_start();
-/*if (isset($_POST["results-visibility"])) {
-    $pdo = new PDO("mysql:host=localhost;dbname=votadb", 'root', 'AWS24VotaPRRojo_'); //AWS24VotaPRRojo_
+    <?php
+    include 'data/dbAccess.php';
+    session_start();
+    /*if (isset($_POST["results-visibility"])) {
+        $pdo = new PDO("mysql:host=localhost;dbname=votadb", 'root', 'AWS24VotaPRRojo_'); //AWS24VotaPRRojo_
 
-    $query = $pdo->prepare("UPDATE Surveys SET public_results");
-}*/
-$pdo = new PDO("mysql:host=$hostname;dbname=$dbname", $username, $pw);
-if (isset($_SESSION["usuario"]) && isset($_GET["id"])) {
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        if(isset($_POST['blocked'])){
-            $query = $pdo->prepare("UPDATE Survey SET survey_block = 1 WHERE survey_id = :survey_id");
-    
-            $query->bindParam(':survey_id', $_GET["id"], PDO::PARAM_INT);
-            $query->execute();
-        }else{
-            $query = $pdo->prepare("UPDATE Survey SET survey_block = 0 WHERE survey_id = :survey_id");
-    
-            $query->bindParam(':survey_id', $_GET["id"], PDO::PARAM_INT);
-            $query->execute();
+        $query = $pdo->prepare("UPDATE Surveys SET public_results");
+    }*/
+    $pdo = new PDO("mysql:host=$hostname;dbname=$dbname", $username, $pw);
+    if (isset($_SESSION["usuario"]) && isset($_GET["id"])) {
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+            if (isset($_POST['blocked'])) {
+                $query = $pdo->prepare("UPDATE Survey SET survey_block = 1 WHERE survey_id = :survey_id");
+
+                $query->bindParam(':survey_id', $_GET["id"], PDO::PARAM_INT);
+                $query->execute();
+            } else {
+                $query = $pdo->prepare("UPDATE Survey SET survey_block = 0 WHERE survey_id = :survey_id");
+
+                $query->bindParam(':survey_id', $_GET["id"], PDO::PARAM_INT);
+                $query->execute();
+            }
+            $title_privacity = $_POST['title-visibility'];
+            $quest_privacity = $_POST['results-visibility'];
+            if (isset($_POST["results-visibility"])) {
+                $query = $pdo->prepare("UPDATE Survey SET public_title = :tit_priv  WHERE survey_id = :survey_id");
+                $query->bindParam(':survey_id', $_GET["id"], PDO::PARAM_INT);
+                $query->bindParam(':tit_priv', $title_privacity, PDO::PARAM_STR);
+                $query->execute();
+            }
+
+            if (isset($_POST["title-visibility"])) {
+                $query = $pdo->prepare("UPDATE Survey SET public_results = :quest_priv  WHERE survey_id = :survey_id ");
+                $query->bindParam(':survey_id', $_GET["id"], PDO::PARAM_INT);
+                $query->bindParam(':quest_priv', $quest_privacity, PDO::PARAM_STR);
+                $query->execute();
+            }
+
+            echo "<ul id='notification__list'></ul><script>successfulNotification('Los cambios se han guardado correctamente.')</script>";
         }
-        $title_privacity = $_POST['title-visibility'];
-        $quest_privacity = $_POST['results-visibility'];
-        if (isset($_POST["results-visibility"])) {
-            $query = $pdo->prepare("UPDATE Survey SET public_title = :tit_priv  WHERE survey_id = :survey_id");
-            $query->bindParam(':survey_id', $_GET["id"], PDO::PARAM_INT);
-            $query->bindParam(':tit_priv', $title_privacity, PDO::PARAM_STR);
-            $query->execute();
+
+
+        $query = $pdo->prepare("SELECT * FROM Survey WHERE user_id = :user_id AND survey_id = :survey_id");
+
+        $query->bindParam(':user_id', $_SESSION["usuario"], PDO::PARAM_INT);
+        $query->bindParam(':survey_id', $_GET["id"], PDO::PARAM_INT);
+        $query->execute();
+
+        $row = $query->fetch();
+
+        $question_text;
+        $start_time;
+        $end_time;
+        $is_published;
+
+        // Cambiar parámetro dentro de $row
+        if ($row) {
+            $question_text = $row["survey_title"];
+            $start_time = $row["start_date"];
+            $end_time = $row["end_date"];
+            $is_published = $row["public_title"];
+            $survey_status = $row['survey_block'];
+            $title_status = $row['public_title'];
+            $quest_status = $row['public_results'];
+        } else {
+            // Añadir las notificaciones
+            echo "<script> errorNotification('No tienes una encuesta con esa ID.'); </script>";
         }
-        
-        if (isset($_POST["title-visibility"])) {        
-            $query = $pdo->prepare("UPDATE Survey SET public_results = :quest_priv  WHERE survey_id = :survey_id ");
-            $query->bindParam(':survey_id', $_GET["id"], PDO::PARAM_INT);
-            $query->bindParam(':quest_priv', $quest_privacity, PDO::PARAM_STR);
-            $query->execute();
-        }
+
+        $query = $pdo->prepare("SELECT option_id, option_text FROM SurveyOption WHERE survey_id = :survey_id;");
+
+        $queryDos = $pdo->prepare("SELECT option_id, count(*) AS countOfVotes FROM UserVote WHERE option_id = :question_id;");
+        //    SELECT option_id, option_text, countVotes FROM Questions WHERE survey_id = 3 AND countVotes = (SELECT count(*) FROM Votes_User WHERE option_id = 5 or option_id = 6);
     
-        echo "<ul id='notification__list'></ul><script>successfulNotification('Los cambios se han guardado correctamente.')</script>";
-    }
-   
+        /*
+        SELECT Orders.OrderID, Customers.CustomerName, Orders.OrderDate
+        FROM Orders
+        INNER JOIN Customers ON Orders.CustomerID=Customers.CustomerID;
 
-    $query = $pdo->prepare("SELECT * FROM Survey WHERE user_id = :user_id AND survey_id = :survey_id");
+        SELECT option_id.Questions, option_text.Questions, count(option_id.Votes_User) From Questions INNER JOIN Votes_User ON option_id.Votes_User=option_id.Questions;
+        */
 
-    $query->bindParam(':user_id', $_SESSION["usuario"], PDO::PARAM_INT);
-    $query->bindParam(':survey_id', $_GET["id"], PDO::PARAM_INT);
-    $query->execute();
+        $query->bindParam(":survey_id", $_GET["id"], PDO::PARAM_INT);
+        $query->execute();
 
-    $row = $query->fetch();
+        $rows = $query->fetchAll();
 
-    $question_text;
-    $start_time;
-    $end_time;
-    $is_published;
+        $questions = [];
+        foreach ($rows as $row) {
+            // $questions[$row['option_id']] = $row['option_text'];
+            $queryDos->bindParam(":question_id", $row['option_id'], PDO::PARAM_INT);
+            $queryDos->execute();
 
-    // Cambiar parámetro dentro de $row
-    if ($row) {
-        $question_text = $row["survey_title"];
-        $start_time = $row["start_date"];
-        $end_time = $row["end_date"];
-        $is_published = $row["public_title"];
-        $survey_status = $row['survey_block'];
-        $title_status = $row['public_title'];
-        $quest_status = $row['public_results'];
+            $rowDos = $queryDos->fetch();
+
+            // $questions[(int) $row['option_id']] = [$row['option_text'], (int) $rowDos['countOfVotes']];
+            array_push($questions, ['id' => $row['option_id'], 'optionText' => $row['option_text'], 'countOfVotes' => $rowDos['countOfVotes']]);
+        }
+
+        echo "<input type='hidden' id='questions-to-js' name='questions' value='" . json_encode($questions, JSON_UNESCAPED_UNICODE) . "'>";
+
     } else {
-        // Añadir las notificaciones
-        echo "<script> errorNotification('No tienes una encuesta con esa ID.'); </script>";
+        header("HTTP/1.1 403 Forbidden");
+        exit();
     }
 
-    $query = $pdo->prepare("SELECT option_id, option_text FROM SurveyOption WHERE survey_id = :survey_id;");
-
-    $queryDos = $pdo->prepare("SELECT option_id, count(*) AS countOfVotes FROM UserVote WHERE option_id = :question_id;");
-    //    SELECT option_id, option_text, countVotes FROM Questions WHERE survey_id = 3 AND countVotes = (SELECT count(*) FROM Votes_User WHERE option_id = 5 or option_id = 6);
-
-    /*
-    SELECT Orders.OrderID, Customers.CustomerName, Orders.OrderDate
-    FROM Orders
-    INNER JOIN Customers ON Orders.CustomerID=Customers.CustomerID;
-
-    SELECT option_id.Questions, option_text.Questions, count(option_id.Votes_User) From Questions INNER JOIN Votes_User ON option_id.Votes_User=option_id.Questions;
-    */
-
-    $query->bindParam(":survey_id", $_GET["id"], PDO::PARAM_INT);
-    $query->execute();
-
-    $rows = $query->fetchAll();
-
-    $questions = [];
-    foreach ($rows as $row) {
-        // $questions[$row['option_id']] = $row['option_text'];
-        $queryDos->bindParam(":question_id", $row['option_id'], PDO::PARAM_INT);
-        $queryDos->execute();
-
-        $rowDos = $queryDos->fetch();
-
-        // $questions[(int) $row['option_id']] = [$row['option_text'], (int) $rowDos['countOfVotes']];
-        array_push($questions, ['id' => $row['option_id'], 'optionText' => $row['option_text'], 'countOfVotes' => $rowDos['countOfVotes']]);
-    }
-
-    echo "<input type='hidden' id='questions-to-js' name='questions' value='" . json_encode($questions, JSON_UNESCAPED_UNICODE) . "'>";
-
-} else {
-    header("HTTP/1.1 403 Forbidden");
-    exit();
-}
-
-?>
+    ?>
 
 
     <meta charset="UTF-8">
@@ -129,8 +130,9 @@ if (isset($_SESSION["usuario"]) && isset($_GET["id"])) {
 </head>
 
 <body id="survey_details">
-    <a href="/list_polls.php"><svg style="transform: rotate(90deg); margin-right: 5px;" width="24" height="24"
-            viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
+    <?php include_once ("common/header.php"); ?>
+    <a href="/list_polls.php"><svg class="icono" style="transform: rotate(90deg); margin-right: 5px;" width="24"
+            height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
             stroke-linejoin="round">
             <path stroke="none" d="M0 0h24v24H0z" fill="none" />
             <path
@@ -150,8 +152,8 @@ if (isset($_SESSION["usuario"]) && isset($_GET["id"])) {
                     <!--<label><input type="radio" name="chart-opt" class="chart-opt" value="pie-chart"></label>
                     <label><input type="radio" name="chart-opt" class="chart-opt" value="column-chart"></label>-->
                     <button class="chart-opt active-chart-butt" id="pie-chart">
-                        <svg width="16" height="16" viewBox="0 0 22 22" stroke-width="2" stroke="currentColor"
-                            fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <svg class="icono" width="16" height="16" viewBox="0 0 22 22" stroke-width="2"
+                            stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                             <path
                                 d="M10 3.2a9 9 0 1 0 10.8 10.8a1 1 0 0 0 -1 -1h-6.8a2 2 0 0 1 -2 -2v-7a.9 .9 0 0 0 -1 -.8" />
@@ -160,8 +162,8 @@ if (isset($_SESSION["usuario"]) && isset($_GET["id"])) {
                         Pastel
                     </button>
                     <button class="chart-opt" id="column-chart">
-                        <svg width="16" height="16" viewBox="0 0 22 22" stroke-width="2" stroke="currentColor"
-                            fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <svg class="icono" width="16" height="16" viewBox="0 0 22 22" stroke-width="2"
+                            stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                             <path d="M3 12m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" />
                             <path d="M9 8m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" />
@@ -199,15 +201,18 @@ if (isset($_SESSION["usuario"]) && isset($_GET["id"])) {
                             echo $titl1e_status;
                             ?>
                             <select name="title-visibility" id="title-visibility">
-                            <option value="hidden" <?php echo ($title_status == 'hidden') ? 'selected' : ''; ?>>Oculto</option>
-                                <option value="private" <?php echo ($title_status == 'private') ? 'selected' : ''; ?>>Privado</option>
-                                <option value="public" <?php echo ($title_status == 'public') ? 'selected' : ''; ?>>Público</option>
+                                <option value="hidden" <?php echo ($title_status == 'hidden') ? 'selected' : ''; ?>>Oculto
+                                </option>
+                                <option value="private" <?php echo ($title_status == 'private') ? 'selected' : ''; ?>>
+                                    Privado</option>
+                                <option value="public" <?php echo ($title_status == 'public') ? 'selected' : ''; ?>>
+                                    Público</option>
                             </select>
                         </div>
-                        
+
                     </div>
                     <?php
-                    if($survey_status == 0){
+                    if ($survey_status == 0) {
                         echo '<div id="button_block">';
                         echo '<label>Bloquear Encuesta</label>';
                         echo '<div class="container">';
@@ -217,7 +222,7 @@ if (isset($_SESSION["usuario"]) && isset($_GET["id"])) {
                         echo '</label>';
                         echo '</div>';
                         echo '</div>';
-                    }else{
+                    } else {
                         echo '<div id="button_block">';
                         echo '<label>Bloquear Encuesta</label>';
                         echo '<div class="container">';
@@ -236,10 +241,12 @@ if (isset($_SESSION["usuario"]) && isset($_GET["id"])) {
 
         </aside>
     </main>
-
+    <div class="footer">
+        <?php include_once ("common/footer.php") ?>
+    </div>
 </body>
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         // Valor por defecto obtenido desde PHP
         var valorPorDefecto = "<?php echo $quest_status; ?>";
         // Establecer la opción seleccionada por defecto en el segundo select solo al cargar la página
@@ -247,7 +254,7 @@ if (isset($_SESSION["usuario"]) && isset($_GET["id"])) {
     });
 
     // Escuchar el evento change en el segundo select
-    $("#title-visibility").on("change", function() {
+    $("#title-visibility").on("change", function () {
         // Obtener el valor seleccionado del segundo select
         var secondSelectValue = $(this).val();
 
